@@ -65,14 +65,3 @@ python interactive_ik_demo.py
 # 运行高级交互式IK演示（包含动画和轨迹）
 python interactive_ik_advanced.py
 ```
-
-## 评分标准
-- FK实现正确性 (30%)
-- IK实现正确性 (30%)
-- MPC控制器性能 (30%)
-- 代码质量和文档 (10%)
-
-## 提交要求
-- 完整的Python代码
-- 实验报告（包含结果分析和讨论）
-- 运行演示视频或截图 
