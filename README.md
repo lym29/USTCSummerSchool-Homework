@@ -83,7 +83,26 @@ python main.py
 
 本项目包含以下需要实现的功能：
 
-### 1. 梯形速度轨迹生成 (`_calculate_trapezoid_profile`)
+### 1. 三连杆机器人运动学
+- **基本任务**: 
+  - 实现正运动学(FK)计算
+    - 计算末端执行器的位置和姿态
+    - 考虑关节角度限制
+  - 实现逆运动学(IK)求解
+    - 基于优化的方法
+    - 基于雅可比矩阵的方法
+- **进阶任务**:
+  - 处理IK的多解情况
+  - 确保解在关节限制范围内
+  - 处理不可达位置的情况
+  - 优化求解效率
+- **相关文件**: `robot_kinematics/three_link_robot.py`
+- **入口函数**: 
+  - `ThreeLinkRobot.forward_kinematics()`
+  - `ThreeLinkRobot.inverse_kinematics_jacobian()`
+- **使用示例**: `main.py`
+
+### 2. 梯形速度轨迹生成
 - **基本任务**: 实现梯形速度轨迹的计算
   - 计算加速和减速时间
   - 处理加速、匀速和减速三个阶段
@@ -91,17 +110,18 @@ python main.py
   - 处理总距离过短的特殊情况（需要重新计算最大速度）
 - **相关文件**: `robot_kinematics/path_planning.py`
 - **入口函数**: `PathPlanner._calculate_trapezoid_profile()`
+- **使用示例**: `main.py`
 
-### 2. 关节空间轨迹插值 (`interpolate_joint_space`)
+### 3. 关节空间轨迹插值
 - **基本任务**: 实现关节空间的梯形速度轨迹插值
 - **进阶任务**: 实现其他轨迹插值方法，例如：
   - 三次样条插值
   - 五次多项式插值
 - **相关文件**: `robot_kinematics/path_planning.py`
 - **入口函数**: `PathPlanner.interpolate_joint_space()`
-- **使用示例**: `examples/simple_example.py`
+- **使用示例**: `main.py`
 
-### 3. 操作空间轨迹插值 (`interpolate_operational_space`)
+### 4. 操作空间轨迹插值 (`interpolate_operational_space`)
 - **基本任务**: 实现操作空间的梯形速度轨迹插值
 - **进阶任务**: 实现其他轨迹插值方法，例如：
   - 圆弧轨迹插值
