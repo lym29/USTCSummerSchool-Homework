@@ -17,6 +17,13 @@ class PathPlanner:
         返回：
             s: 位移序列
             t: 时间序列
+            
+        TODO:
+        1. 实现梯形速度轨迹的计算
+           - 计算加速和减速时间
+           - 处理加速、匀速和减速三个阶段
+           - 确保满足最大速度和加速度约束
+           - 处理总距离过短的特殊情况（需要重新计算最大速度）
         """
         # 计算加速和减速时间
         t_acc = vmax / amax
@@ -63,6 +70,11 @@ class PathPlanner:
             amax: Maximum acceleration (per joint)
         返回：
             traj: Interpolated joint trajectory, shape (num_points, dof)
+            
+        TODO:
+        1. 实现关节空间的轨迹插值(梯形速度轨迹)
+        进阶: 实现其他轨迹插值方法
+
         """
         waypoints = np.array(waypoints)
         if len(waypoints) < 2:
@@ -136,6 +148,11 @@ class PathPlanner:
             initial_joint_angles: Initial joint angles for IK calculation
         返回：
             traj: Interpolated joint angle trajectory, shape (num_points, dof)
+            
+        TODO:
+        1. 实现操作空间的轨迹插值(梯形速度轨迹)
+        进阶: 实现其他轨迹插值方法
+
         """
         if robot is None:
             raise ValueError("Robot instance must be provided for operational space interpolation")

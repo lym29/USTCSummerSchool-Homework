@@ -1,63 +1,122 @@
-# 机器人控制编程作业
+# Robot Control Homework
 
-## 作业目标
-本作业旨在帮助学生掌握机器人学中的核心概念：
-1. **正向运动学 (Forward Kinematics, FK)** - 计算机器人末端执行器的位置和姿态
-2. **逆向运动学 (Inverse Kinematics, IK)** - 根据期望的末端位置计算关节角度
-3. **基于动力学的控制** - 使用模型预测控制(MPC)实现精确的位置控制
+这是一个用于机器人运动学和控制的教学项目，主要包含三连杆机器人的运动学分析和轨迹规划功能。
 
 ## 项目结构
+
 ```
 robot_control_homework/
-├── README.md                 # 本文件
-├── requirements.txt          # 依赖包
-├── main.py                   # 主程序入口
-├── robot_kinematics/         # 运动学模块
-│   ├── __init__.py
-│   ├── three_link_robot.py   # 三连杆机器人实现
-│   └── utils.py              # 工具函数
-├── dynamics_control/         # 动力学控制模块
-│   ├── __init__.py
-│   ├── mpc_controller.py     # MPC控制器
-│   └── cart_dynamics.py      # 一维小车动力学模型
-└── visualization/            # 可视化模块
-    ├── __init__.py
-    ├── robot_visualizer.py   # 机器人可视化
-    └── control_visualizer.py # 控制结果可视化
+├── dynamics_control/        # 动力学和控制相关代码
+├── robot_kinematics/       # 运动学相关代码
+│   ├── three_link_robot.py # 三连杆机器人的运动学实现
+│   ├── path_planning.py    # 轨迹规划算法
+│   └── utils.py           # 工具函数
+├── visualization/          # 可视化相关代码
+│   ├── robot_visualizer.py # 机器人可视化
+│   └── control_visualizer.py # 控制效果可视化
+└── examples/              # 示例代码
+    └── simple_example.py  # 简单使用示例
 ```
 
-## 学习任务
+## 主要功能
 
-### 任务1: 正向运动学 (FK)
-- 实现三连杆机器人的正向运动学计算
-- 理解DH参数和齐次变换矩阵
-- 计算末端执行器的位置和姿态
+1. **三连杆机器人运动学**
+   - 正运动学计算
+   - 逆运动学求解（优化方法和雅可比方法）
+   - 工作空间分析
 
-### 任务2: 逆向运动学 (IK)
-- 实现三连杆机器人的逆向运动学
-- 使用数值解方法
-- 交互式IK演示，可以在平面上点击选择目标位置
+2. **轨迹规划**
+   - 关节空间插值
+   - 操作空间插值
+   - 速度和加速度约束
 
-### 任务3: 基于动力学的MPC控制
-- 建立一维小车的动力学模型
-- 实现模型预测控制器
-- 设计目标函数和约束条件
+3. **交互式演示**
+   - 可视化机器人构型
+   - 实时逆运动学求解
+   - 轨迹规划和动画展示
+   - 支持不同IK方法切换
+   - 支持不同插值模式切换
 
+## 使用说明
 
-## 运行方式
+### 安装依赖
+
 ```bash
-# 安装依赖
 pip install -r requirements.txt
+```
 
-# 运行主程序
-python main.py
+### 运行交互式演示
 
-# 运行简单示例
-python examples/simple_example.py
-
-# 运行交互式IK演示
-python interactive_ik_demo.py
-
-# 运行高级交互式IK演示（包含动画和轨迹）
+```bash
 python interactive_ik_advanced.py
 ```
+
+### 交互式演示功能
+
+1. **点击操作**
+   - 在工作空间内点击以设置目标位置
+   - 系统会自动计算逆运动学解并显示机器人构型
+
+2. **轨迹生成**
+   - 通过多次点击创建轨迹点
+   - 使用"Play Trajectory"按钮播放轨迹动画
+
+3. **控制选项**
+   - 切换IK方法（优化法/雅可比法）
+   - 切换插值模式（关节空间/操作空间）
+   - 调整动画播放速度
+   - 重置机器人位置
+   - 清除已创建的轨迹
+
+## TODO 实现任务
+
+本项目包含以下需要实现的功能：
+
+### 1. 梯形速度轨迹生成 (`_calculate_trapezoid_profile`)
+- **基本任务**: 实现梯形速度轨迹的计算
+  - 计算加速和减速时间
+  - 处理加速、匀速和减速三个阶段
+  - 确保满足最大速度和加速度约束
+  - 处理总距离过短的特殊情况（需要重新计算最大速度）
+- **相关文件**: `robot_kinematics/path_planning.py`
+- **入口函数**: `PathPlanner._calculate_trapezoid_profile()`
+
+### 2. 关节空间轨迹插值 (`interpolate_joint_space`)
+- **基本任务**: 实现关节空间的梯形速度轨迹插值
+- **进阶任务**: 实现其他轨迹插值方法，例如：
+  - 三次样条插值
+  - 五次多项式插值
+  - 最小加加速度轨迹
+- **相关文件**: `robot_kinematics/path_planning.py`
+- **入口函数**: `PathPlanner.interpolate_joint_space()`
+- **使用示例**: `examples/simple_example.py`
+
+### 3. 操作空间轨迹插值 (`interpolate_operational_space`)
+- **基本任务**: 实现操作空间的梯形速度轨迹插值
+- **进阶任务**: 实现其他轨迹插值方法，例如：
+  - 直线轨迹插值
+  - 圆弧轨迹插值
+  - 贝塞尔曲线插值
+- **相关文件**: `robot_kinematics/path_planning.py`
+- **入口函数**: `PathPlanner.interpolate_operational_space()`
+- **使用示例**: `interactive_ik_advanced.py`
+
+### 实现建议
+1. 建议按照上述顺序实现功能，因为后面的功能会依赖前面的实现
+2. 每个功能都提供了基本任务和进阶任务，建议先完成基本任务
+3. 可以参考 `examples` 目录下的示例来测试实现的功能
+4. 使用 `interactive_ik_advanced.py` 可以直观地验证实现效果
+
+### 测试方法
+1. 运行 `interactive_ik_advanced.py` 进行交互式测试
+2. 使用不同的插值方法和参数进行对比
+3. 观察轨迹的连续性和平滑性
+4. 验证是否满足速度和加速度约束
+
+## 注意事项
+
+1. 确保安装了所有必要的Python依赖
+2. 运行演示程序时，建议先阅读使用说明
+3. 在进行轨迹规划时，注意避免机器人运动到奇异位置
+4. 不同IK方法可能会得到不同的解，这是正常现象
+

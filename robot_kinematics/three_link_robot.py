@@ -40,7 +40,7 @@ class ThreeLinkRobot:
         返回:
             4x4 齐次变换矩阵，表示末端执行器的位置和姿态
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 
         # 1. 使用DH参数计算每个连杆的变换矩阵
         # 2. 将所有变换矩阵相乘得到末端位置
@@ -86,11 +86,6 @@ class ThreeLinkRobot:
         返回:
             关节角度数组 [theta1, theta2, theta3]
         """
-        # TODO: 学生需要实现这个函数
-        # 提示:
-        # 1. 定义目标函数（当前位置到目标位置的距离）
-        # 2. 使用scipy.optimize.minimize进行优化
-        # 3. 添加关节角度约束
         
         if initial_guess is None:
             initial_guess = np.zeros(self.n_joints)
@@ -161,8 +156,6 @@ class ThreeLinkRobot:
         返回:
             x_coords, y_coords: 工作空间边界坐标
         """
-        # TODO: 学生需要实现这个函数
-        # 提示: 通过采样关节角度空间来获得工作空间边界
         
         theta1_range = np.linspace(-np.pi, np.pi, num_points)
         theta2_range = np.linspace(-np.pi, np.pi, num_points)
