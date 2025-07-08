@@ -5,6 +5,8 @@ This is a take-away homework for [USTC Summer School: Embodied AI Courses](http:
 这是[中科大暑期学校：具身智能课程](http://staff.ustc.edu.cn/~fuxm/course/SummerSchool_2025/program.html)的一份编程作业。
 用于演示机器人运动学，主要包含三连杆机器人的运动学分析和轨迹规划功能。
 
+课程资料：https://lym29.github.io/USTCSummerSchool-Homework/
+
 ## 演示视频
 
 https://github.com/user-attachments/assets/0fc06d7b-1cdf-4608-891a-851adae5c116
