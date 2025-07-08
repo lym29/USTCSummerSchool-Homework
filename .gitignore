@@ -120,12 +120,3 @@ dmypy.json
 .Trashes
 ehthumbs.db
 Thumbs.db
-
-# Robot control specific
-*.png
-*.jpg
-*.jpeg
-*.gif
-*.mp4
-*.avi
-*.mov 

@@ -1,11 +1,20 @@
-# Robot Control Homework
+# Basics of Robotics: Kinematics and Dynamics
 
-这是一个用于机器人运动学和控制的教学项目，主要包含三连杆机器人的运动学分析和轨迹规划功能。
+This is a take-away homework for [USTC Summer School: Embodied AI Courses](http://staff.ustc.edu.cn/~fuxm/course/SummerSchool_2025/program.html).
+
+这是[中科大暑期学校：具身智能课程](http://staff.ustc.edu.cn/~fuxm/course/SummerSchool_2025/program.html)的一份编程作业。
+用于演示机器人运动学，主要包含三连杆机器人的运动学分析和轨迹规划功能。
+
+## 演示视频
+
+<video src="./media/homework_demo.mp4" controls></video>
+
+上面的视频展示了完成作业后的运行效果。
 
 ## 项目结构
 
 ```
-robot_control_homework/
+USTCSummerSchool-Homework/
 ├── dynamics_control/        # 动力学和控制相关代码
 ├── robot_kinematics/       # 运动学相关代码
 │   ├── three_link_robot.py # 三连杆机器人的运动学实现
