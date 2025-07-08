@@ -64,17 +64,17 @@ def test_inverse_kinematics():
     for i, target_pos in enumerate(test_positions):
         print(f"\nTest {i+1}: Target position = {target_pos}")
         
-        # 数值逆运动学
-        ik_numerical = robot.inverse_kinematics_numerical(target_pos)
-        if ik_numerical is not None:
-            print(f"Numerical solution: [{', '.join([f'{a:.3f}' for a in ik_numerical])}]")
+        # 优化逆运动学
+        ik_optimization = robot.inverse_kinematics_optimization(target_pos)
+        if ik_optimization is not None:
+            print(f"Optimization solution: [{', '.join([f'{a:.3f}' for a in ik_optimization])}]")
             
             # 验证解的正确性
-            actual_pos = robot.get_end_effector_position(ik_numerical)
+            actual_pos = robot.get_end_effector_position(ik_optimization)
             error = np.linalg.norm(actual_pos - target_pos)
             print(f"Position error: {error:.6f}")
         else:
-            print("Numerical solution: No solution")
+            print("Optimization solution: No solution")
 
 
 def test_mpc_control():

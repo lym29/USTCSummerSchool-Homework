@@ -75,9 +75,9 @@ class ThreeLinkRobot:
         T = self.forward_kinematics(joint_angles)
         return T[:3, 3]
     
-    def inverse_kinematics_numerical(self, target_position, initial_guess=None):
+    def inverse_kinematics_optimization(self, target_position, initial_guess=None):
         """
-        数值逆运动学 - 使用优化方法求解
+        优化逆运动学 - 使用优化方法求解
         
         参数:
             target_position: 目标位置 [x, y, z]
@@ -131,18 +131,13 @@ class ThreeLinkRobot:
         - main.py: test_forward_kinematics() 函数中用于测试不同关节配置
         - test_interactive.py: test_singularity() 函数中专门测试奇异点检测
         - 可视化程序中可以用于标记奇异配置
-        
-        注意：此函数暂时不需要学生实现，课程后续会详细讲解奇异点检测方法
-        
+
         参数:
             joint_angles: 关节角度数组
         
         返回:
             bool: 是否处于奇异点
         """
-        # 注意：奇异点检测暂时不需要学生实现
-        # 这里提供一个简单的实现作为参考，学生可以跳过此函数
-        
         # 计算雅可比矩阵
         J = jacobian_matrix(self, joint_angles)
         
@@ -208,7 +203,7 @@ class ThreeLinkRobot:
         返回:
             关节角度数组 [theta1, theta2, theta3] 或 None (如果未收敛)
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 实现基于雅可比矩阵的逆运动学求解
         # 提示:
         # 1. 使用雅可比矩阵建立线性关系：Δx = J * Δθ
         # 2. 计算雅可比矩阵的伪逆：Δθ = J^+ * Δx
