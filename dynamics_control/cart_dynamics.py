@@ -52,7 +52,7 @@ class CartDynamics:
         返回:
             状态导数 [位置导数, 速度导数]
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 使用牛顿第二定律 F = ma
         
         position, velocity = state
@@ -76,7 +76,7 @@ class CartDynamics:
         返回:
             下一时刻状态 [位置, 速度]
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 使用欧拉积分方法 x[k+1] = x[k] + dt * dx/dt
         
         # 计算状态导数
@@ -101,7 +101,7 @@ class CartDynamics:
             time_array: 时间数组
             state_history: 状态历史
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 使用scipy.integrate.odeint或手动积分
         
         t_start, t_end = t_span
@@ -135,7 +135,7 @@ class CartDynamics:
         返回:
             A_lin, B_lin: 线性化后的系统矩阵
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 使用数值微分计算雅可比矩阵
         
         epsilon = 1e-6
@@ -174,7 +174,7 @@ class CartDynamics:
         返回:
             state_eq, control_eq: 平衡状态和控制输入
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 在平衡点，状态导数应该为0
         
         # 在平衡点，速度应该为0

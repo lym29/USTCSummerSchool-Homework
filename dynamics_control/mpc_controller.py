@@ -53,7 +53,7 @@ class MPCController:
         返回:
             problem, variables: 优化问题和变量
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示:
         # 1. 定义状态和控制变量
         # 2. 添加动力学约束
@@ -115,7 +115,7 @@ class MPCController:
             optimal_control: 最优控制序列
             optimal_states: 最优状态序列
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 调用setup_optimization_problem并求解
         
         # 设置优化问题
@@ -148,7 +148,7 @@ class MPCController:
         返回:
             control_action: 控制动作
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 求解MPC问题，返回第一个控制动作
         
         optimal_control, _ = self.solve_mpc(current_state, target_state)
@@ -173,7 +173,7 @@ class MPCController:
             state_history: 状态历史
             control_history: 控制历史
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 在每个时间步调用MPC控制器
         
         n_steps = int(simulation_time / dt)

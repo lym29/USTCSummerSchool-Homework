@@ -19,8 +19,6 @@ def dh_transform_matrix(a, alpha, d, theta):
     返回:
         4x4 齐次变换矩阵
     """
-    # TODO: 学生需要实现这个函数
-    # 提示: 使用DH参数计算旋转和平移矩阵，然后组合成齐次变换矩阵
     
     # 计算旋转矩阵
     ct = np.cos(theta)
@@ -49,10 +47,6 @@ def rotation_matrix_to_euler(R):
     返回:
         [roll, pitch, yaw] 欧拉角 (弧度)
     """
-    # TODO: 学生需要实现这个函数
-    # 提示: 使用scipy.spatial.transform.Rotation或手动计算
-    
-    # 使用scipy的方法
     r = Rotation.from_matrix(R)
     euler = r.as_euler('xyz')
     return euler
@@ -68,10 +62,6 @@ def euler_to_rotation_matrix(roll, pitch, yaw):
     返回:
         3x3 旋转矩阵
     """
-    # TODO: 学生需要实现这个函数
-    # 提示: 使用scipy.spatial.transform.Rotation或手动计算
-    
-    # 使用scipy的方法
     r = Rotation.from_euler('xyz', [roll, pitch, yaw])
     return r.as_matrix()
 
@@ -87,9 +77,6 @@ def jacobian_matrix(robot, joint_angles):
     返回:
         6xN 雅可比矩阵 (N为关节数)
     """
-    # TODO: 学生需要实现这个函数
-    # 提示: 使用数值微分方法计算雅可比矩阵
-    
     epsilon = 1e-6
     n_joints = len(joint_angles)
     J = np.zeros((6, n_joints))

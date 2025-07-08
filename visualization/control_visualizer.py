@@ -107,7 +107,7 @@ class ControlVisualizer:
             target_state: 目标状态
             title: 图表标题
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 在同一图中绘制不同控制器的结果
         
         colors = ['b', 'g', 'r', 'c', 'm', 'y']
@@ -165,7 +165,7 @@ class ControlVisualizer:
             target_state: 目标状态
             title: 图表标题
         """
-        # TODO: 学生需要实现这个函数
+        # TODO: 需要实现这个函数
         # 提示: 计算并绘制位置误差和速度误差
         
         # 计算误差

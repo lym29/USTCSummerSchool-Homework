@@ -5,7 +5,7 @@
 
 import numpy as np
 from scipy.optimize import minimize
-from .utils import dh_transform_matrix, jacobian_matrix
+from .utils import jacobian_matrix
 
 
 class ThreeLinkRobot:
@@ -40,7 +40,7 @@ class ThreeLinkRobot:
         返回:
             4x4 齐次变换矩阵，表示末端执行器的位置和姿态
         """
-        # TODO: 需要实现这个函数
+        # TODO: 实现Forward Kinematic
         # 提示: 
         # 1. 使用DH参数计算每个连杆的变换矩阵
         # 2. 将所有变换矩阵相乘得到末端位置

@@ -18,16 +18,15 @@ https://github.com/user-attachments/assets/0fc06d7b-1cdf-4608-891a-851adae5c116
 
 ```
 USTCSummerSchool-Homework/
-├── dynamics_control/        # 动力学和控制相关代码
 ├── robot_kinematics/       # 运动学相关代码
 │   ├── three_link_robot.py # 三连杆机器人的运动学实现
 │   ├── path_planning.py    # 轨迹规划算法
 │   └── utils.py           # 工具函数
 ├── visualization/          # 可视化相关代码
-│   ├── robot_visualizer.py # 机器人可视化
-│   └── control_visualizer.py # 控制效果可视化
-└── examples/              # 示例代码
-    └── simple_example.py  # 简单使用示例
+│   └── robot_visualizer.py # 机器人可视化
+├── main.py                 # 主程序入口
+├── test.py                # 测试文件
+└── requirements.txt       # 项目依赖文件
 ```
 
 ## 主要功能
@@ -60,7 +59,7 @@ pip install -r requirements.txt
 ### 运行交互式演示
 
 ```bash
-python interactive_ik_advanced.py
+python main.py
 ```
 
 ### 交互式演示功能
@@ -98,7 +97,6 @@ python interactive_ik_advanced.py
 - **进阶任务**: 实现其他轨迹插值方法，例如：
   - 三次样条插值
   - 五次多项式插值
-  - 最小加加速度轨迹
 - **相关文件**: `robot_kinematics/path_planning.py`
 - **入口函数**: `PathPlanner.interpolate_joint_space()`
 - **使用示例**: `examples/simple_example.py`
@@ -106,21 +104,20 @@ python interactive_ik_advanced.py
 ### 3. 操作空间轨迹插值 (`interpolate_operational_space`)
 - **基本任务**: 实现操作空间的梯形速度轨迹插值
 - **进阶任务**: 实现其他轨迹插值方法，例如：
-  - 直线轨迹插值
   - 圆弧轨迹插值
   - 贝塞尔曲线插值
 - **相关文件**: `robot_kinematics/path_planning.py`
 - **入口函数**: `PathPlanner.interpolate_operational_space()`
-- **使用示例**: `interactive_ik_advanced.py`
+- **使用示例**: `main.py`
 
 ### 实现建议
 1. 建议按照上述顺序实现功能，因为后面的功能会依赖前面的实现
 2. 每个功能都提供了基本任务和进阶任务，建议先完成基本任务
-3. 可以参考 `examples` 目录下的示例来测试实现的功能
-4. 使用 `interactive_ik_advanced.py` 可以直观地验证实现效果
+3. 可以参考 `test.py` 的示例来测试实现的功能
+4. 使用 `main.py` 可以直观地验证实现效果
 
 ### 测试方法
-1. 运行 `interactive_ik_advanced.py` 进行交互式测试
+1. 运行 `main.py` 进行交互式测试
 2. 使用不同的插值方法和参数进行对比
 3. 观察轨迹的连续性和平滑性
 4. 验证是否满足速度和加速度约束

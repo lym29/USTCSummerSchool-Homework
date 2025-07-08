@@ -35,12 +35,6 @@ class RobotVisualizer:
             show_workspace: Whether to show workspace
             title: Plot title
         """
-        # TODO: Students need to implement this function
-        # Hints:
-        # 1. Calculate position of each joint
-        # 2. Draw links and joints
-        # 3. Optional: Show workspace and target position
-        
         # Create figure
         self.fig, self.ax = plt.subplots(figsize=(10, 8))
         
@@ -96,10 +90,7 @@ class RobotVisualizer:
         
         Returns:
             joint_positions: List of joint positions
-        """
-        # TODO: Students need to implement this function
-        # Hint: Use forward kinematics to calculate position of each joint
-        
+        """  
         joint_positions = [np.array([0, 0])]  # Base position
         
         # Accumulate joint angles
@@ -127,8 +118,6 @@ class RobotVisualizer:
             interval: 动画间隔 (ms)
             save_path: 保存路径
         """
-        # TODO: 学生需要实现这个函数
-        # 提示: 使用matplotlib.animation.FuncAnimation创建动画
         
         fig, ax = plt.subplots(figsize=(10, 8))
         
@@ -206,9 +195,6 @@ class RobotVisualizer:
         参数:
             num_points: 采样点数量
         """
-        # TODO: 学生需要实现这个函数
-        # 提示: 调用机器人的get_workspace_boundary方法
-        
         x_coords, y_coords = self.robot.get_workspace_boundary(num_points)
         
         plt.figure(figsize=(10, 8))
@@ -228,9 +214,6 @@ class RobotVisualizer:
             joint_angle_sequence: 关节角度序列
             time_array: 时间数组
         """
-        # TODO: 学生需要实现这个函数
-        # 提示: 绘制每个关节的角度随时间的变化
-        
         if time_array is None:
             time_array = np.arange(len(joint_angle_sequence))
         
