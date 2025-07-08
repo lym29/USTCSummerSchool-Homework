@@ -48,19 +48,7 @@ class ThreeLinkRobot:
         
         # 对于平面三连杆机器人，使用简单的几何方法
         # 累积关节角度
-        cumulative_theta = 0
-        x, y = 0, 0
-        
-        for i, length in enumerate(self.link_lengths):
-            cumulative_theta += joint_angles[i]
-            x += length * np.cos(cumulative_theta)
-            y += length * np.sin(cumulative_theta)
-        
-        # 构建齐次变换矩阵
-        T = np.eye(4)
-        T[:2, 3] = [x, y]
-        
-        return T
+        raise NotImplementedError("Not implemented")
     
     def get_end_effector_position(self, joint_angles):
         """
@@ -203,50 +191,4 @@ class ThreeLinkRobot:
         # 3. 迭代更新关节角度：θ_new = θ_old + Δθ
         # 4*. (进阶) 添加阻尼因子避免奇异点问题 (Damped least squares)
         
-        if initial_guess is None:
-            initial_guess = np.zeros(self.n_joints)
-        
-        # 初始化关节角度
-        joint_angles = np.array(initial_guess, dtype=float)
-        
-        for iteration in range(max_iterations):
-            # 计算当前位置
-            current_position = self.get_end_effector_position(joint_angles)
-            
-            # 计算位置误差
-            position_error = np.array(target_position[:2]) - np.array(current_position[:2])
-            
-            # 检查收敛性
-            if np.linalg.norm(position_error) < tolerance:
-                return joint_angles
-            
-            # 计算雅可比矩阵
-            J = jacobian_matrix(self, joint_angles)
-            
-            # 只考虑位置雅可比（前2行）
-            J_pos = J[:2, :]
-            
-            # 检查雅可比矩阵是否接近奇异
-            if np.linalg.cond(J_pos) > 1e6:  # 条件数过大表示接近奇异
-                # 使用阻尼最小二乘法避免奇异点
-                lambda_damp = 0.01  # 阻尼因子
-                J_damped = J_pos.T @ J_pos + lambda_damp * np.eye(J_pos.shape[1])
-                J_pinv = np.linalg.solve(J_damped, J_pos.T)
-            else:
-                # 使用伪逆
-                J_pinv = np.linalg.pinv(J_pos)
-            
-            # 计算关节角度增量
-            delta_theta = J_pinv @ position_error
-            
-            # 应用步长限制
-            delta_theta = step_size * delta_theta
-            
-            # 更新关节角度
-            joint_angles += delta_theta
-            
-            # 将关节角度限制在合理范围内
-            joint_angles = np.arctan2(np.sin(joint_angles), np.cos(joint_angles))
-        
-        # 如果达到最大迭代次数仍未收敛，返回None
-        return None 
+        raise NotImplementedError("Not implemented")
