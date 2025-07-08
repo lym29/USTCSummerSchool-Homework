@@ -7,7 +7,8 @@ This is a take-away homework for [USTC Summer School: Embodied AI Courses](http:
 
 ## 演示视频
 
-<video src="./media/homework_demo.mp4" controls></video>
+https://github.com/user-attachments/assets/0fc06d7b-1cdf-4608-891a-851adae5c116
+
 
 上面的视频展示了完成作业后的运行效果。
 
