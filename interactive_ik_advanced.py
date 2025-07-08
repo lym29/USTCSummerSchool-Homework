@@ -37,6 +37,9 @@ class AdvancedInteractiveIKDemo:
         self.animation_running = False
         self.trajectory_points = []
         
+        # IK方法选择 (0: 数值IK, 1: 雅可比IK)
+        self.ik_method = 0
+        
         # Create figure
         self.fig = plt.figure(figsize=(15, 10))
         self.setup_plot()
@@ -53,85 +56,75 @@ class AdvancedInteractiveIKDemo:
         
         # Animation object
         self.anim = None
-    
-    def setup_plot(self):
-        """
-        Setup plot
-        """
-        # Main plot area
-        self.ax = plt.subplot2grid((3, 4), (0, 0), colspan=3, rowspan=2)
-        self.ax.set_xlabel('X (m)')
-        self.ax.set_ylabel('Y (m)')
-        self.ax.set_title('Advanced Interactive IK Demo - Click to select target position, drag to create trajectory')
-        self.ax.grid(True)
-        self.ax.set_aspect('equal')
         
-        # Set axis limits
-        max_reach = sum(self.robot.link_lengths)
-        self.ax.set_xlim(-max_reach*1.2, max_reach*1.2)
-        self.ax.set_ylim(-max_reach*1.2, max_reach*1.2)
+        # Mouse tracking
+        self.mouse_pressed = False
+        self.last_mouse_pos = None
         
-        # Show workspace
-        x_coords, y_coords = self.robot.get_workspace_boundary(num_points=500)
-        self.ax.scatter(x_coords, y_coords, c='lightblue', alpha=0.3, s=1, label='Workspace')
-        
-        # Joint angles display area
-        self.ax_angles = plt.subplot2grid((3, 4), (2, 0), colspan=2)
-        self.ax_angles.set_title('Joint Angles')
-        self.ax_angles.set_xlabel('Joint')
-        self.ax_angles.set_ylabel('Angle (rad)')
-        self.ax_angles.grid(True)
-        
-        # Error display area
-        self.ax_error = plt.subplot2grid((3, 4), (2, 2), colspan=2)
-        self.ax_error.set_title('Position Error History')
-        self.ax_error.set_xlabel('Time Step')
-        self.ax_error.set_ylabel('Error (m)')
-        self.ax_error.grid(True)
-        
-        # Error history
+        # Error tracking
         self.error_history = []
         self.time_steps = []
         self.step_counter = 0
     
+    def setup_plot(self):
+        """
+        Setup the plot layout
+        """
+        # Main robot plot
+        self.ax = plt.subplot2grid((2, 3), (0, 0), colspan=2, rowspan=2)
+        
+        # Joint angles plot
+        self.ax_angles = plt.subplot2grid((2, 3), (0, 2))
+        
+        # Error plot
+        self.ax_error = plt.subplot2grid((2, 3), (1, 2))
+        
+        # Setup main plot
+        max_reach = sum(self.robot.link_lengths)
+        self.ax.set_xlim(-max_reach*1.2, max_reach*1.2)
+        self.ax.set_ylim(-max_reach*1.2, max_reach*1.2)
+        self.ax.set_xlabel('X (m)')
+        self.ax.set_ylabel('Y (m)')
+        self.ax.set_title('Advanced Interactive IK Demo')
+        self.ax.grid(True)
+        self.ax.set_aspect('equal')
+        
+        # Show workspace
+        x_coords, y_coords = self.robot.get_workspace_boundary(num_points=500)
+        self.ax.scatter(x_coords, y_coords, c='lightblue', alpha=0.3, s=1, label='Workspace')
+    
     def setup_controls(self):
         """
-        设置控制元素
+        Setup control buttons and sliders
         """
-        # 按钮区域
-        button_width = 0.08
+        # Button positions
+        button_width = 0.12
         button_height = 0.04
         
-        # 重置按钮
-        ax_reset = plt.axes([0.75, 0.85, button_width, button_height])
+        # Reset button
+        ax_reset = plt.axes([0.02, 0.02, button_width, button_height])
         self.btn_reset = Button(ax_reset, 'Reset')
         self.btn_reset.on_clicked(self.reset_robot)
         
-        # 切换IK方法按钮
-        ax_switch = plt.axes([0.85, 0.85, button_width, button_height])
-        self.btn_switch = Button(ax_switch, 'Switch IK Method')
+        # Switch IK method button
+        ax_switch = plt.axes([0.15, 0.02, button_width, button_height])
+        self.btn_switch = Button(ax_switch, 'Switch IK')
         self.btn_switch.on_clicked(self.switch_ik_method)
         
-        # 清除轨迹按钮
-        ax_clear = plt.axes([0.75, 0.80, button_width, button_height])
+        # Clear trajectory button
+        ax_clear = plt.axes([0.15, 0.02, button_width, button_height])
         self.btn_clear = Button(ax_clear, 'Clear Trajectory')
         self.btn_clear.on_clicked(self.clear_trajectory)
         
-        # 播放轨迹按钮
-        ax_play = plt.axes([0.85, 0.80, button_width, button_height])
+        # Play trajectory button
+        ax_play = plt.axes([0.28, 0.02, button_width, button_height])
         self.btn_play = Button(ax_play, 'Play Trajectory')
         self.btn_play.on_clicked(self.play_trajectory)
         
-        # 动画速度滑块
-        ax_speed = plt.axes([0.75, 0.70, button_width*2, button_height])
-        self.slider_speed = Slider(ax_speed, 'Animation Speed', 0.1, 2.0, valinit=1.0)
-        
-        # 当前IK方法
-        self.use_analytical_ik = True
-        
-        # 鼠标状态
-        self.mouse_pressed = False
-        self.last_mouse_pos = None
+        # Animation speed slider
+        ax_speed = plt.axes([0.45, 0.02, 0.2, button_height])
+        self.speed_slider = Slider(ax_speed, 'Speed', 0.1, 2.0, valinit=1.0)
+        self.speed_slider.on_changed(self.on_speed_change)
     
     def on_click(self, event):
         """
@@ -202,19 +195,14 @@ class AdvancedInteractiveIKDemo:
             return
         
         try:
-            if self.use_analytical_ik:
-                # 解析IK
-                self.ik_solution = self.robot.inverse_kinematics_analytical(
-                    self.target_position, elbow_up=True
-                )
-                if self.ik_solution is None:
-                    # 尝试肘部向下的解
-                    self.ik_solution = self.robot.inverse_kinematics_analytical(
-                        self.target_position, elbow_up=False
-                    )
-            else:
+            if self.ik_method == 0:
                 # 数值IK
                 self.ik_solution = self.robot.inverse_kinematics_numerical(
+                    self.target_position, initial_guess=self.current_joint_angles
+                )
+            else:
+                # 雅可比IK
+                self.ik_solution = self.robot.inverse_kinematics_jacobian(
                     self.target_position, initial_guess=self.current_joint_angles
                 )
             
@@ -302,8 +290,8 @@ class AdvancedInteractiveIKDemo:
                            bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.8))
         
         # 显示当前IK方法
-        method_text = "Analytical IK" if self.use_analytical_ik else "Numerical IK"
-        self.ax.text(0.02, 0.88, f"Current method: {method_text}", 
+        method_name = "Numerical IK" if self.ik_method == 0 else "Jacobian IK"
+        self.ax.text(0.02, 0.88, f"Current method: {method_name}", 
                     transform=self.ax.transAxes, verticalalignment='top',
                     bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
         
@@ -371,7 +359,9 @@ class AdvancedInteractiveIKDemo:
         """
         切换IK求解方法
         """
-        self.use_analytical_ik = not self.use_analytical_ik
+        self.ik_method = (self.ik_method + 1) % 2
+        method_name = "Numerical IK" if self.ik_method == 0 else "Jacobian IK"
+        print(f"Switch to {method_name} method")
         
         # 如果有目标位置，重新求解
         if self.target_position is not None:
@@ -385,9 +375,6 @@ class AdvancedInteractiveIKDemo:
         清除轨迹
         """
         self.trajectory_points = []
-        self.error_history = []
-        self.time_steps = []
-        self.step_counter = 0
         self.update_plot()
         self.fig.canvas.draw()
     
@@ -396,32 +383,37 @@ class AdvancedInteractiveIKDemo:
         播放轨迹动画
         """
         if len(self.trajectory_points) < 2:
-            print("Insufficient trajectory points, cannot play animation")
+            print("No trajectory to play")
             return
         
         if self.animation_running:
-            if self.anim:
+            # 停止动画
+            if self.anim is not None:
                 self.anim.event_source.stop()
             self.animation_running = False
             self.btn_play.label.set_text('Play Trajectory')
         else:
+            # 开始动画
             self.animation_running = True
             self.btn_play.label.set_text('Stop Animation')
             self.animate_trajectory()
+        
+        self.fig.canvas.draw()
     
     def animate_trajectory(self):
         """
         轨迹动画
         """
-        if not self.animation_running:
-            return
+        if self.anim is not None:
+            self.anim.event_source.stop()
         
-        # 创建动画
         self.anim = FuncAnimation(
-            self.fig, self.animation_frame, 
+            self.fig, 
+            self.animation_frame, 
             frames=len(self.trajectory_points),
-            interval=int(1000 / self.slider_speed.val),  # 毫秒
-            repeat=True, blit=False
+            interval=int(1000 / self.speed_slider.val),  # 毫秒
+            repeat=False,
+            blit=False
         )
     
     def animation_frame(self, frame):
@@ -432,14 +424,18 @@ class AdvancedInteractiveIKDemo:
             self.target_position = self.trajectory_points[frame]
             self.solve_ik()
             self.update_plot()
-        
-        return []
+    
+    def on_speed_change(self, val):
+        """
+        速度改变回调
+        """
+        if self.animation_running and self.anim is not None:
+            self.anim.event_source.interval = int(1000 / val)
     
     def run(self):
         """
-        运行交互式演示
+        运行演示
         """
-        plt.tight_layout()
         plt.show()
 
 
@@ -449,19 +445,15 @@ def main():
     """
     print("=== Advanced Interactive IK Demo ===")
     print("Instructions:")
-    print("1. Click anywhere on the plane to select target position")
-    print("2. The program will automatically calculate IK solution and display robot configuration")
-    print("3. Click 'Switch IK Method' button to toggle between analytical and numerical IK")
-    print("4. Click 'Reset' button to restore robot to initial state")
-    print("5. Click 'Clear Trajectory' button to clear all trajectory points")
-    print("6. Click 'Play Trajectory' button to play trajectory animation")
-    print("7. Use slider to adjust animation speed")
-    print("8. Red star indicates target position, blue solid line indicates current robot configuration")
-    print("9. Green line indicates trajectory path")
-    print("10. Bottom charts show joint angles and error history")
+    print("1. Click on the plane to select target positions")
+    print("2. Create trajectory by clicking multiple points")
+    print("3. Use 'Play Trajectory' to animate the robot movement")
+    print("4. Adjust animation speed with the slider")
+    print("5. Use 'Clear Trajectory' to remove all trajectory points")
+    print("6. Use 'Reset' to restore initial state")
     print("")
     
-    # 创建交互式演示
+    # 创建高级交互式演示
     demo = AdvancedInteractiveIKDemo(link_lengths=[1.0, 1.0, 0.5])
     
     # 运行演示

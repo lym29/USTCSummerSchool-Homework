@@ -75,81 +75,6 @@ class ThreeLinkRobot:
         T = self.forward_kinematics(joint_angles)
         return T[:3, 3]
     
-    def inverse_kinematics_analytical(self, target_position, elbow_up=True):
-        """
-        解析逆运动学 - 使用几何方法求解
-        
-        参数:
-            target_position: 目标位置 [x, y, z]
-            elbow_up: 是否使用肘部向上的解
-        
-        返回:
-            关节角度数组 [theta1, theta2, theta3] 或 None (如果无解)
-        """
-        # TODO: 学生需要实现这个函数
-        # 提示:
-        # 1. 使用余弦定理求解关节角度
-        # 2. 考虑多解情况（肘部向上/向下）
-        # 3. 检查解的有效性（在工作空间内）
-        
-        x, y = target_position[:2]  # 平面机器人，忽略z坐标
-        L1, L2, L3 = self.link_lengths
-        
-        # 计算到目标位置的距离
-        r = np.sqrt(x**2 + y**2)
-        
-        # 检查是否在工作空间内
-        max_reach = L1 + L2 + L3
-        min_reach = max(0, abs(L1 - L2) - L3)
-        
-        if r > max_reach or r < min_reach:
-            return None
-        
-        # 计算第一个关节角度（基座旋转）
-        theta1 = np.arctan2(y, x)
-        
-        # 对于三连杆机器人，我们需要考虑第三个连杆的影响
-        # 第三个连杆会从第二个连杆的末端延伸L3距离
-        # 所以前两个连杆需要达到的位置是目标位置减去第三个连杆的贡献
-        
-        # 计算前两个连杆需要达到的位置
-        # 这里我们假设第三个连杆指向目标方向
-        effective_target_r = r - L3
-        
-        # 检查前两个连杆是否能达到这个位置
-        if effective_target_r < 0 or effective_target_r > L1 + L2:
-            return None
-        
-        # 使用余弦定理计算第二个关节角度
-        cos_theta2 = (effective_target_r**2 - L1**2 - L2**2) / (2 * L1 * L2)
-        
-        # 检查解的有效性
-        if abs(cos_theta2) > 1:
-            return None
-        
-        if elbow_up:
-            theta2 = np.arccos(cos_theta2)
-        else:
-            theta2 = -np.arccos(cos_theta2)
-        
-        # 计算第三个关节角度
-        # 第三个关节的角度应该使得末端执行器达到目标位置
-        # 计算前两个连杆的末端位置
-        x2 = L1 * np.cos(theta1) + L2 * np.cos(theta1 + theta2)
-        y2 = L1 * np.sin(theta1) + L2 * np.sin(theta1 + theta2)
-        
-        # 计算从第二个关节到目标的向量
-        dx = x - x2
-        dy = y - y2
-        
-        # 第三个关节的角度（相对于第二个连杆）
-        theta3 = np.arctan2(dy, dx) - (theta1 + theta2)
-        
-        # 确保角度在合理范围内
-        theta3 = np.arctan2(np.sin(theta3), np.cos(theta3))
-        
-        return np.array([theta1, theta2, theta3])
-    
     def inverse_kinematics_numerical(self, target_position, initial_guess=None):
         """
         数值逆运动学 - 使用优化方法求解
@@ -196,18 +121,39 @@ class ThreeLinkRobot:
         """
         检查机器人是否处于奇异点
         
+        奇异点检测的目的：
+        1. 识别机器人配置中的奇异点，这些点会导致雅可比矩阵接近奇异
+        2. 在奇异点附近，IK求解可能不稳定或无法收敛
+        3. 帮助用户了解机器人的运动限制和潜在问题区域
+        4. 为路径规划和运动控制提供重要的几何信息
+        
+        调用位置：
+        - main.py: test_forward_kinematics() 函数中用于测试不同关节配置
+        - test_interactive.py: test_singularity() 函数中专门测试奇异点检测
+        - 可视化程序中可以用于标记奇异配置
+        
+        注意：此函数暂时不需要学生实现，课程后续会详细讲解奇异点检测方法
+        
         参数:
             joint_angles: 关节角度数组
         
         返回:
             bool: 是否处于奇异点
         """
-        # TODO: 学生需要实现这个函数
-        # 提示: 计算雅可比矩阵的行列式，如果接近0则为奇异点
+        # 注意：奇异点检测暂时不需要学生实现
+        # 这里提供一个简单的实现作为参考，学生可以跳过此函数
         
+        # 计算雅可比矩阵
         J = jacobian_matrix(self, joint_angles)
-        det = np.linalg.det(J[:2, :2])  # 只考虑位置雅可比
         
+        # 对于平面机器人，只考虑位置雅可比（前2x2子矩阵）
+        position_jacobian = J[:2, :2]
+        
+        # 计算雅可比矩阵的行列式
+        det = np.linalg.det(position_jacobian)
+        
+        # 如果行列式接近0，则认为处于奇异点
+        # 阈值设为1e-6，可以根据需要调整
         return abs(det) < 1e-6
     
     def get_workspace_boundary(self, num_points=100):
@@ -236,4 +182,83 @@ class ThreeLinkRobot:
                 x_coords.append(pos[0])
                 y_coords.append(pos[1])
         
-        return np.array(x_coords), np.array(y_coords) 
+        return np.array(x_coords), np.array(y_coords)
+    
+    def inverse_kinematics_jacobian(self, target_position, initial_guess=None, max_iterations=200, tolerance=1e-4, step_size=0.05):
+        """
+        基于雅可比矩阵的逆运动学 - 使用雅可比矩阵伪逆迭代求解
+        
+        原理：
+        1. 使用雅可比矩阵建立关节速度与末端执行器速度的关系
+        2. 通过雅可比矩阵的伪逆计算关节角度增量
+        3. 迭代更新关节角度直到收敛到目标位置
+        
+        优势：
+        - 计算速度快，适合实时应用
+        - 可以处理冗余机器人
+        - 易于添加关节限制和避障约束
+        
+        参数:
+            target_position: 目标位置 [x, y, z]
+            initial_guess: 初始猜测的关节角度
+            max_iterations: 最大迭代次数
+            tolerance: 收敛容差
+            step_size: 步长参数（阻尼因子）
+        
+        返回:
+            关节角度数组 [theta1, theta2, theta3] 或 None (如果未收敛)
+        """
+        # TODO: 学生需要实现这个函数
+        # 提示:
+        # 1. 使用雅可比矩阵建立线性关系：Δx = J * Δθ
+        # 2. 计算雅可比矩阵的伪逆：Δθ = J^+ * Δx
+        # 3. 迭代更新关节角度：θ_new = θ_old + Δθ
+        # 4*. (进阶) 添加阻尼因子避免奇异点问题 (Damped least squares)
+        
+        if initial_guess is None:
+            initial_guess = np.zeros(self.n_joints)
+        
+        # 初始化关节角度
+        joint_angles = np.array(initial_guess, dtype=float)
+        
+        for iteration in range(max_iterations):
+            # 计算当前位置
+            current_position = self.get_end_effector_position(joint_angles)
+            
+            # 计算位置误差
+            position_error = np.array(target_position[:2]) - np.array(current_position[:2])
+            
+            # 检查收敛性
+            if np.linalg.norm(position_error) < tolerance:
+                return joint_angles
+            
+            # 计算雅可比矩阵
+            J = jacobian_matrix(self, joint_angles)
+            
+            # 只考虑位置雅可比（前2行）
+            J_pos = J[:2, :]
+            
+            # 检查雅可比矩阵是否接近奇异
+            if np.linalg.cond(J_pos) > 1e6:  # 条件数过大表示接近奇异
+                # 使用阻尼最小二乘法避免奇异点
+                lambda_damp = 0.01  # 阻尼因子
+                J_damped = J_pos.T @ J_pos + lambda_damp * np.eye(J_pos.shape[1])
+                J_pinv = np.linalg.solve(J_damped, J_pos.T)
+            else:
+                # 使用伪逆
+                J_pinv = np.linalg.pinv(J_pos)
+            
+            # 计算关节角度增量
+            delta_theta = J_pinv @ position_error
+            
+            # 应用步长限制
+            delta_theta = step_size * delta_theta
+            
+            # 更新关节角度
+            joint_angles += delta_theta
+            
+            # 将关节角度限制在合理范围内
+            joint_angles = np.arctan2(np.sin(joint_angles), np.cos(joint_angles))
+        
+        # 如果达到最大迭代次数仍未收敛，返回None
+        return None 

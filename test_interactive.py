@@ -31,16 +31,6 @@ def test_basic_ik():
     for i, target_pos in enumerate(test_positions):
         print(f"\nTest {i+1}: Target position = {target_pos}")
         
-        # 解析IK
-        ik_analytical = robot.inverse_kinematics_analytical(target_pos)
-        if ik_analytical is not None:
-            print(f"  Analytical IK solution: {ik_analytical}")
-            actual_pos = robot.get_end_effector_position(ik_analytical)
-            error = np.linalg.norm(actual_pos - target_pos)
-            print(f"  Position error: {error:.6f}")
-        else:
-            print("  Analytical IK: No solution")
-        
         # 数值IK
         ik_numerical = robot.inverse_kinematics_numerical(target_pos)
         if ik_numerical is not None:
@@ -76,7 +66,7 @@ def test_workspace():
     ]
     
     for point in test_points:
-        ik_solution = robot.inverse_kinematics_analytical(point)
+        ik_solution = robot.inverse_kinematics_numerical(point)
         reachable = ik_solution is not None
         print(f"Point {point}: {'Reachable' if reachable else 'Unreachable'}")
 

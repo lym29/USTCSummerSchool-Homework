@@ -64,18 +64,6 @@ def test_inverse_kinematics():
     for i, target_pos in enumerate(test_positions):
         print(f"\nTest {i+1}: Target position = {target_pos}")
         
-        # 解析逆运动学
-        ik_analytical = robot.inverse_kinematics_analytical(target_pos)
-        if ik_analytical is not None:
-            print(f"Analytical solution: [{', '.join([f'{a:.3f}' for a in ik_analytical])}]")
-            
-            # 验证解的正确性
-            actual_pos = robot.get_end_effector_position(ik_analytical)
-            error = np.linalg.norm(actual_pos - target_pos)
-            print(f"Position error: {error:.6f}")
-        else:
-            print("Analytical solution: No solution")
-        
         # 数值逆运动学
         ik_numerical = robot.inverse_kinematics_numerical(target_pos)
         if ik_numerical is not None:

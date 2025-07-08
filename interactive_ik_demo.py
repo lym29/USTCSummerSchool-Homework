@@ -34,6 +34,9 @@ class InteractiveIKDemo:
         self.target_position = None
         self.ik_solution = None
         
+        # IK方法选择 (0: 数值IK, 1: 雅可比IK)
+        self.ik_method = 0
+        
         # 创建图形
         self.fig, self.ax = plt.subplots(figsize=(12, 10))
         self.setup_plot()
@@ -76,7 +79,7 @@ class InteractiveIKDemo:
         设置控制按钮
         """
         # 按钮位置
-        button_width = 0.15
+        button_width = 0.12
         button_height = 0.05
         
         # 重置按钮
@@ -85,12 +88,9 @@ class InteractiveIKDemo:
         self.btn_reset.on_clicked(self.reset_robot)
         
         # 切换IK方法按钮
-        ax_switch = plt.axes([0.85, 0.05, button_width, button_height])
-        self.btn_switch = Button(ax_switch, 'Switch IK Method')
+        ax_switch = plt.axes([0.83, 0.05, button_width, button_height])
+        self.btn_switch = Button(ax_switch, 'Switch IK')
         self.btn_switch.on_clicked(self.switch_ik_method)
-        
-        # 当前IK方法
-        self.use_analytical_ik = True
     
     def on_click(self, event):
         """
@@ -128,22 +128,16 @@ class InteractiveIKDemo:
             return
         
         try:
-            if self.use_analytical_ik:
-                print(f"Use Analytical IK, target position: {self.target_position}")
-                # 解析IK
-                self.ik_solution = self.robot.inverse_kinematics_analytical(
-                    self.target_position, elbow_up=True
-                )
-                if self.ik_solution is None:
-                    print("No solution with elbow up, trying elbow down...")
-                    # 尝试肘部向下的解
-                    self.ik_solution = self.robot.inverse_kinematics_analytical(
-                        self.target_position, elbow_up=False
-                    )
-            else:
+            if self.ik_method == 0:
                 print(f"Use Numerical IK, target position: {self.target_position}")
                 # 数值IK
                 self.ik_solution = self.robot.inverse_kinematics_numerical(
+                    self.target_position, initial_guess=self.current_joint_angles
+                )
+            else:
+                print(f"Use Jacobian IK, target position: {self.target_position}")
+                # 雅可比IK
+                self.ik_solution = self.robot.inverse_kinematics_jacobian(
                     self.target_position, initial_guess=self.current_joint_angles
                 )
             
@@ -220,8 +214,8 @@ class InteractiveIKDemo:
                            bbox=dict(boxstyle='round', facecolor='lightcoral', alpha=0.8))
         
         # 显示当前IK方法
-        method_text = "Analytical IK" if self.use_analytical_ik else "Numerical IK"
-        self.ax.text(0.02, 0.8, f"Current Method: {method_text}", 
+        method_name = "Numerical IK" if self.ik_method == 0 else "Jacobian IK"
+        self.ax.text(0.02, 0.8, f"Current Method: {method_name}", 
                     transform=self.ax.transAxes,
                     bbox=dict(boxstyle='round', facecolor='lightblue', alpha=0.8))
         
@@ -244,8 +238,8 @@ class InteractiveIKDemo:
         """
         切换IK求解方法
         """
-        self.use_analytical_ik = not self.use_analytical_ik
-        method_name = "Analytical IK" if self.use_analytical_ik else "Numerical IK"
+        self.ik_method = (self.ik_method + 1) % 2
+        method_name = "Numerical IK" if self.ik_method == 0 else "Jacobian IK"
         print(f"Switch to {method_name} method")
         
         # 如果有目标位置，重新求解
@@ -257,7 +251,7 @@ class InteractiveIKDemo:
     
     def run(self):
         """
-        运行交互式演示
+        运行演示
         """
         plt.show()
 
@@ -270,7 +264,7 @@ def main():
     print("Instructions:")
     print("1. Click anywhere on the plane to select target position")
     print("2. The program will automatically calculate IK solution and display robot configuration")
-    print("3. Click 'Switch IK Method' button to toggle between analytical and numerical IK")
+    print("3. Click 'Switch IK' button to toggle between Numerical IK and Jacobian IK")
     print("4. Click 'Reset' button to restore robot to initial state")
     print("5. Red star indicates target position, blue solid line indicates current robot configuration")
     print("6. Green dashed line indicates IK solution (if successful)")

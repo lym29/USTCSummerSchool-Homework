@@ -42,19 +42,17 @@
 **文件**: `robot_kinematics/three_link_robot.py`
 
 **需要实现的功能**:
-1. `inverse_kinematics_analytical()` - 解析逆运动学
-2. `inverse_kinematics_numerical()` - 数值逆运动学
-3. `check_singularity()` - 检查奇异点
+1. `inverse_kinematics_numerical()` - 数值逆运动学
+2. `check_singularity()` - 检查奇异点（暂时不需要实现，课程后续会讲解）
 
 **关键概念**:
-- 几何方法求解逆运动学
 - 优化方法求解逆运动学
-- 奇异点检测
+- 奇异点检测（概念性了解）
 
 **提示**:
-- 使用余弦定理求解关节角度
-- 考虑多解情况（肘部向上/向下）
 - 使用scipy.optimize.minimize进行数值优化
+- 定义合适的目标函数和约束条件
+- 奇异点检测函数已提供实现，学生可以跳过
 
 ### 任务3: 基于动力学的MPC控制 (30分)
 

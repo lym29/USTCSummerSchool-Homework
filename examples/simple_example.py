@@ -51,7 +51,7 @@ def simple_ik_example():
     target_position = [1.5, 0.5, 0]
     
     # 求解逆运动学
-    joint_angles = robot.inverse_kinematics_analytical(target_position)
+    joint_angles = robot.inverse_kinematics_numerical(target_position)
     
     if joint_angles is not None:
         print(f"Target position: {target_position}")
