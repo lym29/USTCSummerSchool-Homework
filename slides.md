@@ -20,10 +20,12 @@ drawings:
 transition: slide-left
 # enable MDC Syntax: https://sli.dev/features/mdc
 mdc: true
+
 # open graph
 # seoMeta:
 #  ogImage: https://cover.sli.dev
 ---
+
 # Basics of Robotics: <br> Kinematics and Dynamics <!--Slide 1-->
 
 <div class="mt-12 py-1" hover:bg="white op-10">
@@ -39,14 +41,14 @@ mdc: true
   </a>
 </div>
 
-
 <!--
-The last comment block of each slide will be treated as slide notes. It will be visible and editable in Presenter Mode along with the slide. [Read more in the docs](https://sli.dev/guide/syntax.html#notes)
+机器人基础：运动学与动力学
 -->
 
 ---
 transition: fade-out
 ---
+
 # Course Overview <!--Slide 2-->
 This course covers the fundamental concepts of robotics, focusing on three key areas:
 
@@ -81,6 +83,11 @@ This course covers the fundamental concepts of robotics, focusing on three key a
   </div>
 </div>
 
+<!--
+首先我们会介绍机器人的运动学建模，
+以及如何对机器人做轨迹规划，
+最后我们会介绍一些机器人动力学的基本知识和基于动力学的控制。
+-->
 
 ---
 transition: slide-up
@@ -170,10 +177,19 @@ An assembly of rigid bodies (called **links**) connected by **joints**.
   </div>
 </div>
 
-<!-- Revolut Joint: 转动关节
-Prismatic Joint: 滑动关节
-Universal Joint: 万向关节 -->
+<!--
+就像人类或者动物的身体是由骨骼和关节构成。机器人也由很多个刚体部件和连接它们的关节构成。
 
+一般我们用树的结构来表示机器人的连接关系，这种结构叫做Kinematic Chain。
+
+当然机器人的关节类型有非常多种，比如转动关节、滑动关节还有万向节等等。
+
+这里我们只讨论转动关节。
+
+Revolut Joint: 转动关节
+Prismatic Joint: 滑动关节
+Universal Joint: 万向关节
+-->
 
 ---
 transition: slide-up
@@ -209,6 +225,21 @@ flowchart LR
 
 $\alpha$ and $\theta$ take positive when rotation is made counter-clockwise.
 
+<!--
+在给定连接关系之后，我们应该如何描述机器人的状态？
+
+一般是通过DH参数来表示。
+
+
+这里我们用两个连杆和连接它们的关节为例，假设我们已经知道这里绿色的第一个关节他的位置和局部标架，这里蓝色轴是代表它的旋转轴Z轴。红色是杆的方向。怎么计算蓝色连杆末端的位置和局部标架？
+
+首先我们来看运动状态是怎么沿着杆和关节传播的。
+
+已知起始绿色杆左边关节的状态，我们先把它的局部标架沿着杆平移，平移长度就是杆的长度a，这样我们可以得到绿色杆右端关节的状态。绿杆和蓝杆之间两个关节共享一个旋转轴，但他们在旋转轴上会有一个偏移量d。我们加上这个偏移量，可以得到蓝色杆的状态，而蓝色杆的两端它们的旋转轴也可能发生偏移，我们用alpha表示这个偏转角。此外两个连杆之间也有一个旋转角度theta。
+
+可以注意到这四个参数里，theta是关节旋转角度，是可变的，另外三个取决于连杆的几何，是固定的。
+-->
+
 ---
 transition: slide-up
 layout: two-cols-header
@@ -241,6 +272,7 @@ Let's consider a simple example where:
 transition: slide-up
 layout: two-cols-header
 ---
+
 # Two-Link Planar Arm <!--Slide 7-->
 End effector is the component that interact directly with the environment. 
 
@@ -278,10 +310,17 @@ End-effector is attached to Frame $F_2$.
   </div>
 </div>
 
+<!--
+机械臂直接与环境交互的部分是末端执行器，它的运动空间就是操作空间，就是笛卡尔坐标系下，末端的坐标。而导致末端移动的原因是每个关节的旋转，即这里的q1,q2。他们代表着关节空间。
+
+这两个空间是如何互相转化的？
+-->
+
 ---
 transition: slide-up
 layout: two-cols-header
 ---
+
 # Forward Kinematics <!--Slide 8-->
 
 <div class="text-center mb-8">
@@ -315,10 +354,19 @@ $$
 T_0^2 = T_0^1 \cdot T_1^2
 $$
 
+<!--
+从旋转角计算末端执行器的过程叫前向运动学，即FK。
+
+可以看到连杆两个端点的相对变换可以通过这样一个旋转加平移的奇次矩阵表示。
+
+通过复合每个连杆断点的相对变换，我们可以得到末端相对于原点的位置。
+-->
+
 ---
 transition: slide-up
 layout: two-cols-header
 ---
+
 # Forward Kinematics <!--Slide 9-->
 
 <div class="text-center mb-8">
@@ -356,6 +404,11 @@ y = a_1 \sin q_1 + a_2 \sin(q_1 + q_2)
 \end{cases}
 $$
 
+<!--
+就是这里的计算结果。
+
+通过旋转变换我们就完成了FK的计算。
+-->
 
 ---
 transition: slide-up
@@ -392,7 +445,11 @@ $$
 
 $$\Longrightarrow r^2 = x^2 + y^2 = a_1^2 + a_2^2 + 2 a_1 a_2 \cos q_2$$
 
+<!--
+另一方面，从末端执行器位置计算旋转角则要复杂的多。
 
+我们先用FK的计算结果，可以得到运动学的等式，我们尝试用这个等式计算两连杆旋转角的解析解。
+-->
 
 ---
 transition: slide-up
@@ -464,12 +521,14 @@ Multiple or even infinite solutions may exist for some configurations.
 ---
 transition: slide-up
 ---
+
 # Inverse Kinematics <!--Slide 13-->
 
-For more complex structure:
 
-- IK equations are generally nonlinear; closed-form solutions may not exist.
-- Some targets may have no solutions due to manipulator limitations.
+
+- Equations derived from FK are nonlinear; For more complex structure, closed-form solutions may not exist.
+
+<br>
 
 <div class="bg-gradient-to-r from-blue-50 to-blue-100 p-4 rounded-lg border border-blue-200 mb-3">
   <p class="text-blue-700 text-sm">Analytical solutions are often unavailable; numerical methods are required.</p>
@@ -479,6 +538,8 @@ For more complex structure:
   <div class="text-green-800 font-semibold text-sm mb-1">Key Idea 💡</div>
   <p class="text-green-700 text-sm">Iteratively adjust joint angles to reduce end effector error.</p>
 </div>
+
+$$\min_{q_1,q_2} ||\text{FK}(q_1,q_2)-(x,y)^T||^2$$
 
 To do this efficiently, we need to know how small changes in $[q_1,q_2]$ affect $[x,y]$.
 
@@ -561,6 +622,7 @@ $$
 ---
 transition: slide-up
 ---
+
 # Trajectory Planning <!--Slide 16-->
 
 - **IK:** Finds joint positions to reach a single target pose.
@@ -580,69 +642,41 @@ transition: slide-up
   </div>
 </div>
 
+<!--
+有了IK这个工具后，我们可以计算怎么到达操作空间中的某个点。但是如何从操作空间中一个点到另一个点呢？
+
+在关节空间中，我们可以通过IK得到每个路径点对应的关节角度，再在关节空间插值。这样只要做两次IK，比较高效容易执行。但是对于末端的轨迹不可控。
+
+在操作空间，我们则是直接在两个路径点之间插值，再依次计算IK。这样带来的计算开销更大，但是路径可控。
+-->
+
 ---
 transition: fade
 ---
-# Trajectory Planning <!--Slide 17-->
 
-<div class="flex justify-center items-center gap-8 mt-2">
-  <div class="w-full max-w-sm relative">
-    <img src="./images/cart_vs_joint.gif" class="w-full object-contain rounded-lg shadow-lg" />
+# Trajectory Planning <!--Slide 17-->
+**No matter how we interpolate between each waypoint,** <span style="color: red">**velocity must be continuous!**</span>
+
+<div class="flex justify-center items-center gap-8 mt-30">
+  <div class="max-w-sm relative">
+    <img src="./images/cart_vs_joint.gif" class="w-full object-contain rounded-lg shadow-lg scale-200" />
     <div class="absolute bottom-0 left-0 right-0 flex justify-between px-4 py-2 text-white bg-black bg-opacity-50">
       <span>Operational Space</span>
       <span>Joint Space</span>
     </div>
   </div>
 </div>
-<br>
-<div class="flex-1 ml-8">
-  <table class="w-full border-collapse">
-    <thead>
-      <tr class="bg-gradient-to-r from-blue-500 to-purple-500 text-white">
-        <th class="p-3 text-left">Space</th>
-        <th class="p-3 text-left">Pros</th>
-        <th class="p-3 text-left">Cons</th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr class="border-b border-gray-200">
-        <td class="p-3 font-semibold bg-blue-50">Operational Space</td>
-        <td class="p-3">
-          <ul class="list-disc list-inside">
-            <li>Motion is predictable</li>
-            <li>Better handling of obstacles</li>
-          </ul>
-        </td>
-        <td class="p-3">
-          <ul class="list-disc list-inside">
-            <li>Slower execution</li>
-            <li>Less smooth actuator motion</li>
-          </ul>
-        </td>
-      </tr>
-      <tr>
-        <td class="p-3 font-semibold bg-purple-50">Joint Space</td>
-        <td class="p-3">
-          <ul class="list-disc list-inside">
-            <li>Faster execution</li>
-            <li>Smooth actuator motion</li>
-          </ul>
-        </td>
-        <td class="p-3">
-          <ul class="list-disc list-inside">
-            <li>Unpredictable intermediate points</li>
-            <li>Harder collision avoidance</li>
-          </ul>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-</div>
 
+<!--
+如何让末端执行器经过空间中的多个点？我们可以通过插值来实现。
+
+当然我们必须注意到：一段运动在同一时刻不可能存在两个不同的速度，速度是连续的。
+-->
 
 ---
 transition: fade
 ---
+
 # Types of Trajectory Planning <!--Slide 18-->
 Regardless of whether you choose an operational-space or joint-space trajectory, there are various ways to create trajectories that interpolate pose (or joint configurations) over time.
 - Trapezoidal Velocity: piecewise trajectories of constant acceleration
@@ -653,7 +687,7 @@ Regardless of whether you choose an operational-space or joint-space trajectory,
       <h3 class="text-base font-bold text-blue-800 mb-2">Advantages</h3>
       <ul class="list-none text-blue-700 text-md">
         <p>Simple and efficient to implement.</p>
-        <p>Smooth start and stop.</p>
+        <p>Hardware-friendly</p>
       </ul>
     </div>
     <div>
@@ -666,11 +700,17 @@ Regardless of whether you choose an operational-space or joint-space trajectory,
   </div>
 
   <div class="flex justify-center items-center">
-    <img src="./images/trapezoidal_traj.png" class="w-full object-contain rounded-md shadow-lg" />
+    <img src="./images/trap_velocity.png" class="w-full object-contain rounded-md shadow-lg" />
   </div>
 </div>
 
-<!-- 
+<!--
+梯形速度法，是一种很常用的速度规划方法。它将运动过程分为三个阶段：加速、匀速和减速，并且在加速和减速阶段采用恒定的加速度，使得速度曲线呈现梯形形状。
+
+优点：
+对硬件友好，恒定加速度意味着电机扭矩恒定，可以减少发热，匀速段功耗最低，提升能量效率。
+
+
 缺点：
 控制系统对快速变化无法及时响应
 mechanical shock: 机械冲击 
@@ -680,6 +720,7 @@ mechanical shock: 机械冲击
 ---
 transition: fade
 ---
+
 # Types of Trajectory Planning <!--Slide 19-->
 Regardless of whether you choose an operational-space or joint-space trajectory, there are various ways to create trajectories that interpolate pose (or joint configurations) over time.
 - Polynomial: interpolate between two waypoints using polynomials of various orders.
@@ -709,9 +750,14 @@ Regardless of whether you choose an operational-space or joint-space trajectory,
   </div>
 </div>
 
+<!--
+多项式插值法
+-->
+
 ---
 transition: fade
 ---
+
 # Trajectory Planning <!--Slide 20-->
 
 <div class="flex flex-col items-center relative">
@@ -721,6 +767,10 @@ transition: fade
     <span>Polynomial Interpolation</span>
   </div>
 </div>
+
+<!--
+这里展示了梯形速度法和多项式插值法在操作空间中的对比，可以看到多项式插值的结果更光滑，但是却出现不合理的震荡。
+-->
 
 ---
 transition: slide-up
@@ -929,6 +979,3 @@ class: text-center
   }
 }
 </style>
-
-
-
