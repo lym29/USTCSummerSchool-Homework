@@ -448,7 +448,9 @@ $$\Longrightarrow r^2 = x^2 + y^2 = a_1^2 + a_2^2 + 2 a_1 a_2 \cos q_2$$
 <!--
 另一方面，从末端执行器位置计算旋转角则要复杂的多。
 
-我们先用FK的计算结果，可以得到运动学的等式，我们尝试用这个等式计算两连杆旋转角的解析解。
+我们先用FK的计算结果，可以得到运动学的方程组，它是非线性的。我们现在尝试用这个等式计算两连杆旋转角的解析解。
+
+我们用极坐标表示末端位置。通过对两个等式求平方和，可以将q1消元掉。
 -->
 
 ---
@@ -484,6 +486,16 @@ $$
 
 <span class="text-red-500">There are two values of the angle $q_2$. Why?</span>
 
+<!--
+这样我们就可以得到q2的余弦值。
+注意这里q2的正弦值可以有正负两种。
+
+然后假设它是正的，我们可以看到极坐标中的角度phi是这个角，phi-q1对应的tan值就是这个边除这个边。
+通过这种几何关系我们可以计算出q1.
+
+那么为什么q2有两个值呢？
+-->
+
 ---
 transition: slide-up
 layout: two-cols-header
@@ -518,6 +530,10 @@ $$
 
 Multiple or even infinite solutions may exist for some configurations.
 
+<!--
+这是因为IK问题存在多解情况。
+-->
+
 ---
 transition: slide-up
 ---
@@ -539,9 +555,19 @@ transition: slide-up
   <p class="text-green-700 text-sm">Iteratively adjust joint angles to reduce end effector error.</p>
 </div>
 
-$$\min_{q_1,q_2} ||\text{FK}(q_1,q_2)-(x,y)^T||^2$$
+$$\min_{\mathbf{q}} ||\text{FK}(\mathbf{q})-\mathbf{x}_{tgt}||^2$$
 
-To do this efficiently, we need to know how small changes in $[q_1,q_2]$ affect $[x,y]$.
+We can use gradient desent method to solve it.
+
+<!--
+FK对应的方程组是非线性的，对于更复杂的情况，是没有解析解的。
+
+那我们必须要借助于数值方法求解。
+
+我们可以通过迭代地挑战关节角度去让末端位置更接近target。
+
+那么就是最小化当前末端位置到目标的距离。
+-->
 
 ---
 transition: slide-up
@@ -551,38 +577,28 @@ transition: slide-up
 
 The Jacobian matrix is defined as the partial derivatives of the end-effector position with respect to the joint variables:
 $$
-J(\mathbf{q}) =
-\begin{bmatrix}
-\dfrac{\partial x}{\partial q_1} & \dfrac{\partial x}{\partial q_2} \\[1em]
-\dfrac{\partial y}{\partial q_1} & \dfrac{\partial y}{\partial q_2}
-\end{bmatrix}
+J(\mathbf{q}) = \left(\dfrac{\partial \text{FK}(\mathbf{q})_i}{\partial q_j}\right)_{ij}
 $$
 
-
-Relating joint velocities to end effector velocities
-
-$$
-\begin{bmatrix}
-\dot{x} \\
-\dot{y}
-\end{bmatrix}
-=
-J(\mathbf{q})
-\begin{bmatrix}
-\dot{q}_1 \\
-\dot{q}_2
-\end{bmatrix}
-$$
-
-At each step, the error in task space is computed, and the joint variables are adjusted via the Jacobian (usually its pseudoinverse).
+At each step, the error in operational space is computed, and the joint variables are adjusted via the Jacobian (usually its pseudoinverse).
 
 
 $$\mathbf{q}_{k+1} = \mathbf{q}_k + J^{+}(\mathbf{q}_k) \left( \mathbf{x}_{tgt} - \mathbf{x}_{cur} \right)$$
+
+$$\mathbf{J}^+ = (\mathbf{J}^T \mathbf{J} + \alpha \mathbf{I})^{-1} \mathbf{J}^T$$
+
+<!--
+通过梯度下降法，我们不断迭代减少到目标的差距。
+
+
+注意这里为了保证数值稳定性，防止矩阵条件数过小，我们需要在雅各比矩阵上加上一个正则项，就是这里的alpha。
+-->
 
 ---
 transition: slide-up
 layout: two-cols
 ---
+
 # Numerical IK <!--Slide 15-->
 Jacobian pseudo-inverse method
 $$\mathbf{q}_{k+1} = \mathbf{q}_k + J^{+}(\mathbf{q}_k) \left( \mathbf{x}_{tgt} - \mathbf{x}_{cur} \right)$$
@@ -608,7 +624,7 @@ $$\mathbf{q}_{k+1} = \mathbf{q}_k + J^{+}(\mathbf{q}_k) \left( \mathbf{x}_{tgt} 
 
 $$
 \begin{aligned}
-&\min_{\mathbf{q}} \quad \|\mathbf{x}_{tgt} - f(\mathbf{q})\|^2 \\
+&\min_{\mathbf{q}} \quad \|\mathbf{x}_{tgt} - \text{FK}(\mathbf{q})\|^2 \\
 &\text{subject to:} \quad q_{min} \leq \mathbf{q} \leq q_{max}, \\
 &\qquad\quad\;\;\; \text{collision-free constraint}, \\
 &\qquad\quad\;\;\; \text{other constraints}
@@ -618,6 +634,10 @@ $$
 <div class="bg-gradient-to-r from-indigo-100 to-purple-100 p-4 rounded-lg">
   Additional optimization techniques can be applied, like sampling-based methods and evolutionary algorithms.
 </div>
+
+<!--
+在现实世界应用中，我们需要考虑很多约束，比如碰撞还有角度的限制。那么就需要借助更多的优化工具去解决这一问题。
+-->
 
 ---
 transition: slide-up
