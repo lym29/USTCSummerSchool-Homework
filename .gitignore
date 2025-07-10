@@ -55,3 +55,4 @@ Thumbs.db
 .env
 .cache/
 .output/
+package-lock.json

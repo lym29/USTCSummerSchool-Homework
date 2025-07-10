@@ -899,6 +899,7 @@ class: text-center
   Thank You!
 </div>
 
+<img src="./images/cute_robot.png" class="absolute bottom-4 left-90 w-40" />
 
 <style>
 .animate-bounce-alt {
