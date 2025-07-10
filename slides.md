@@ -678,7 +678,8 @@ transition: fade
 ---
 
 # Types of Trajectory Planning <!--Slide 18-->
-Regardless of whether you choose an operational-space or joint-space trajectory, there are various ways to create trajectories that interpolate pose (or joint configurations) over time.
+**No matter how we interpolate between each waypoint,** <span style="color: red">**velocity must be continuous!**</span>
+
 - Trapezoidal Velocity: piecewise trajectories of constant acceleration
 
 <div class="grid grid-cols-2 gap-6">
@@ -705,14 +706,17 @@ Regardless of whether you choose an operational-space or joint-space trajectory,
 </div>
 
 <!--
-梯形速度法，是一种很常用的速度规划方法。它将运动过程分为三个阶段：加速、匀速和减速，并且在加速和减速阶段采用恒定的加速度，使得速度曲线呈现梯形形状。
+怎么保证速度在路径点连续，最简单的就是让速度在路径点为0。
+
+我们可以采用梯形速度法，是一种很常用的速度规划方法。它将运动过程分为三个阶段：加速、匀速和减速，并且在加速和减速阶段采用恒定的加速度，使得速度曲线呈现梯形形状。
 
 优点：
 对硬件友好，恒定加速度意味着电机扭矩恒定，可以减少发热，匀速段功耗最低，提升能量效率。
 
-
 缺点：
-控制系统对快速变化无法及时响应
+控制系统对快速变化无法及时响应。
+机械冲击发生震荡（小尺度）、运动不稳定。
+
 mechanical shock: 机械冲击 
 当机器人关节的加速度突然从0变为一个很大值时，会产生很大的惯性力，这就是机械冲击。
 -->
@@ -722,7 +726,8 @@ transition: fade
 ---
 
 # Types of Trajectory Planning <!--Slide 19-->
-Regardless of whether you choose an operational-space or joint-space trajectory, there are various ways to create trajectories that interpolate pose (or joint configurations) over time.
+**No matter how we interpolate between each waypoint,** <span style="color: red">**velocity must be continuous!**</span>
+
 - Polynomial: interpolate between two waypoints using polynomials of various orders.
 - For example, a 5th-order polynomial requires position, velocity, and acceleration at both endpoints.
 
@@ -751,7 +756,14 @@ Regardless of whether you choose an operational-space or joint-space trajectory,
 </div>
 
 <!--
-多项式插值法
+另一种方法是用多项式插值法。比如用五次多项式插值，给定一段插值区间两个端点处的位置、速度、加速度信息，我们可以计算插值多项式的系数。
+
+这样我们可以直接指定轨迹在路径点上的速度，保证速度连续。
+
+多项式的优势是有着连续的加速度。和灵活的边界设置。
+
+
+但是计算代价大，还会存在龙格现象（Runge phenomenon），即在用高次多项式插值时，在插值区间的边界附近，插值多项式可能会出现剧烈振荡。
 -->
 
 ---
@@ -807,9 +819,16 @@ To analyze the robot’s dynamic system, we consider:
 - Coriolis and centrifugal forces (due to joint velocities) 科氏力和离心力（旋转坐标系下的惯性力）
 - Gravitational forces (due to gravity acting on the links) 作用在连杆上的重力
 
-<!-- 
+<!--
 给定一条机器人需要跟随的可行路径或关节状态序列，如何控制执行器以跟踪该轨迹？ 
-我们从牛顿定律出发，对机器人进行受力分析
+我们从牛顿第二定律出发，F=ma。这是动力学的基础。
+
+
+假设不存在摩擦，机器人会受哪些力？
+
+首先是电机等执行器提供的驱动力矩。
+其次是旋转坐标系下惯性力，科式力和离心力。
+还有就是连杆上的重力。
 
 科里奥利力（Crioris Force、科氏力）：是非惯性（旋转）参照系下出现的一种惯性力。当一个物体在旋转参照系中运动时，除了受到真实的力以外，还会感受到一个与其运动方向和旋转轴方向都有关的“虚拟力”，即科里奥利力。它的作用是使物体的运动轨迹发生偏转，
 
@@ -894,12 +913,17 @@ where $e = q_d - q$
 ---
 transition: fade-out
 ---
+
 # General robot manipulator controller
 Combine feedforward and feedback controllers.
 
 <div class="flex justify-center items-center mt-15 mb-4">
   <img src="./images/generic_controller_arch.png" class="w-5/6 object-contain rounded-md shadow-lg" />
 </div>
+
+<!--
+结合前馈和反馈控制，我们可以更准确地控制机器人。
+-->
 
 ---
 transition: fade-out
