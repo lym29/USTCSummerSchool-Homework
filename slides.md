@@ -228,14 +228,13 @@ $\alpha$ and $\theta$ take positive when rotation is made counter-clockwise.
 <!--
 在给定连接关系之后，我们应该如何描述机器人的状态？
 
-一般是通过DH参数来表示。
+一般是通过DH参数来表示，两个连杆末端关节的转移矩阵。
 
 
-这里我们用两个连杆和连接它们的关节为例，假设我们已经知道这里绿色的第一个关节他的位置和局部标架，这里蓝色轴是代表它的旋转轴Z轴。红色是杆的方向。怎么计算蓝色连杆末端的位置和局部标架？
+这里我们用两个连杆和连接它们的关节为例，假设我们已经知道这里绿色的末端关节他的位置O_{i-1}和局部标架XYZ_{i-1}，这里蓝色轴是代表它的旋转轴Z轴。红色X轴是杆的方向。怎么计算蓝色连杆末端的位置和局部标架？
 
-首先我们来看运动状态是怎么沿着杆和关节传播的。
 
-已知起始绿色杆左边关节的状态，我们先把它的局部标架沿着杆平移，平移长度就是杆的长度a，这样我们可以得到绿色杆右端关节的状态。绿杆和蓝杆之间两个关节共享一个旋转轴，但他们在旋转轴上会有一个偏移量d。我们加上这个偏移量，可以得到蓝色杆的状态，而蓝色杆的两端它们的旋转轴也可能发生偏移，我们用alpha表示这个偏转角。此外两个连杆之间也有一个旋转角度theta。
+首先我们注意到绿杆和蓝杆之间这两个关节共享一个旋转轴，但他们在旋转轴上会有一个偏移量d。我们先把OXYZ_{i-1}这个局部标架加上这个偏移量后得到OXYZ'.接下来要将它沿着杆平移，平移长度就是杆的长度a，可以得到蓝色杆的状态，而蓝色杆的两端它们的旋转轴也可能发生偏移，就是这里的alpha表示旋转轴绕连杆方向的偏转角。此外两个连杆之间也有一个旋转角度theta，即Link_i相对Link_{i-1}的旋转。
 
 可以注意到这四个参数里，theta是关节旋转角度，是可变的，另外三个取决于连杆的几何，是固定的。
 -->
@@ -531,7 +530,7 @@ $$
 Multiple or even infinite solutions may exist for some configurations.
 
 <!--
-这是因为IK问题存在多解情况。
+从这个简单的例子可以看出来，IK问题存在多解情况。
 -->
 
 ---
@@ -957,12 +956,13 @@ transition: fade-out
 ---
 transition: fade-out
 ---
+
 # Coding Homework
 - FK and IK
 - A simple trajectory planner
 - github repo: https://github.com/lym29/USTCSummerSchool-Homework
 
-<div class="flex justify-center items-center mt-10">
+<div class="flex justify-center items-center md-5">
   <div class="w-3/4">
     <SlidevVideo autoplay controls playbackRate="1.5" class="w-full rounded-md shadow-lg">
       <!-- Anything that can go in an HTML video element. -->
